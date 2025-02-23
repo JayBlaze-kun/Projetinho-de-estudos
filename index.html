@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Estuda Ai</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link rel="stylesheet" href="https://unpkg.com/accordion-js@3.3.4/dist/accordion.min.css">
+    <script src="https://unpkg.com/marked@11.2.0/marked.min.js"></script>
+    <script src="https://unpkg.com/accordion-js@3.3.4/dist/accordion.min.js"></script>
+    <script type="importmap">
+    {
+        "imports": {
+            "@google/generative-ai": "https://esm.run/@google/generative-ai"
+        }
+    }
+    </script>
+</head>
+<body>
+    <header>
+        <h1>🤖 Estuda Ai</h1>
+    </header>
+
+    <main>
+        <section class="botoes">
+            <button id="tirarFoto"><i class="fas fa-camera"></i> Tirar foto</button>
+            <button id="enviarFoto"><i class="fas fa-upload"></i> Enviar foto</button>
+            <button id="enviarPrint"><i class="fas fa-paste"></i> Enviar print</button>
+            <button id="outraQuestao" style="display: none;"><i class="fas fa-question"></i> Outra Questão</button>
+        </section>
+
+        <!-- Adicione esta div para o indicador de loading -->
+        <div id="loading" style="display: none;">
+            <i class="fas fa-spinner fa-spin"></i> Processando...
+        </div>
+
+        <section class="respostas">
+            <div class="accordion-container">
+                <div class="ac">
+                    <h2 class="ac-header">
+                        <button class="ac-trigger">Links</button>
+                    </h2>
+                    <div class="ac-panel">
+                        <div id="linksContent"></div>
+                    </div>
+                </div>
+                <div class="ac">
+                    <h2 class="ac-header">
+                        <button class="ac-trigger">Aula Completa</button>
+                    </h2>
+                    <div class="ac-panel">
+                        <div id="aulaContent"></div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <input type="file" id="fileInput" accept="image/*" style="display: none;">
+
+    <script src="api.js" type="module"></script>
+    <script src="script.js" type="module"></script>
+</body>
+</html>
