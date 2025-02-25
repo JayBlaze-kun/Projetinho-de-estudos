@@ -11,31 +11,109 @@
     --input-bg: #333;
 }
 
+html, body {
+    min-height: 100vh;
+    height: auto !important;
+    margin: 0;
+    padding: 0;
+}
+
 body {
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     background-color: var(--bg-color);
     color: var(--text-color);
     line-height: 1.6;
-    margin: 0;
-    padding: 0;
+    display: flex;
+    flex-direction: column;
+    position: relative;
+    overflow-x: hidden;
 }
 
 header {
-    background-color: var(--secondary-bg);
-    padding: 1rem;
+    background-color: rgba(45, 45, 45, 0.8);
+    padding: 1.5rem;
     text-align: center;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 2px 15px rgba(187, 134, 252, 0.3);
+    backdrop-filter: blur(5px);
+    position: relative;
+    z-index: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.5rem;
 }
 
-h1 {
+/* Título principal do site */
+header h1 {
     color: var(--highlight-color);
     margin: 0;
+    font-family: 'Press Start 2P', cursive;
+    font-size: 1.5rem;
+    letter-spacing: 1px;
+    text-shadow: 
+        2px 2px 0 rgba(0, 0, 0, 0.5),
+        4px 4px 0 rgba(187, 134, 252, 0.2);
+    position: relative;
+    padding: 0.5rem;
+    cursor: default; /* Mantém o cursor padrão */
+    user-select: none; /* Previne seleção do texto */
+}
+
+/* Estilos para os caracteres individuais do título principal */
+header h1 .char {
+    display: inline-block;
+    animation: float 2s ease-in-out infinite;
+    animation-delay: calc(0.1s * var(--char-index));
+}
+
+/* Animação de flutuação suave */
+@keyframes float {
+    0%, 100% {
+        transform: translateY(0);
+    }
+    50% {
+        transform: translateY(-5px);
+    }
+}
+
+/* Efeito hover */
+h1:hover .char {
+    animation: shake 0.5s ease-in-out;
+    animation-delay: calc(0.05s * var(--char-index));
+}
+
+/* Animação de tremida para o hover */
+@keyframes shake {
+    0%, 100% {
+        transform: translateY(0) translateX(0);
+    }
+    25% {
+        transform: translateY(-5px) translateX(-3px);
+    }
+    50% {
+        transform: translateY(5px) translateX(3px);
+    }
+    75% {
+        transform: translateY(-5px) translateX(3px);
+    }
+}
+
+/* Títulos dos accordeons */
+.ac-header h2, .ac-trigger {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    font-size: 1.1rem;
 }
 
 main {
+    flex: 1;
+    width: 100%;
     max-width: 800px;
     margin: 2rem auto;
     padding: 0 1rem;
+    position: relative;
+    z-index: 1;
+    min-height: 0;
+    transition: min-height 0.3s ease-out;
 }
 
 .botoes {
@@ -45,6 +123,10 @@ main {
     margin-bottom: 2rem;
     justify-content: center; /* Centraliza os botões horizontalmente */
     align-items: center; /* Centraliza os botões verticalmente */
+    background-color: rgba(45, 45, 45, 0.6);
+    padding: 1.5rem;
+    border-radius: 15px;
+    backdrop-filter: blur(5px);
 }
 
 button {
@@ -54,13 +136,33 @@ button {
     padding: 0.75rem 1.5rem;
     font-size: 1rem;
     cursor: pointer;
-    border-radius: 5px;
-    transition: background-color 0.3s ease;
+    border-radius: 8px;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 15px rgba(187, 134, 252, 0.3);
+    backdrop-filter: blur(5px);
     flex: 0 1 auto; /* Permite que os botões se ajustem ao conteúdo */
 }
 
 button:hover {
     background-color: var(--button-hover);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(187, 134, 252, 0.4);
+}
+
+button:disabled {
+    opacity: 0.5;
+    cursor: not-allowed !important;
+    pointer-events: all !important;
+    background-color: #666 !important;
+    transform: none !important;
+    box-shadow: none !important;
+}
+
+button:disabled:hover {
+    background-color: #666 !important;
+    transform: none !important;
+    box-shadow: none !important;
+    cursor: not-allowed !important;
 }
 
 button i {
@@ -68,26 +170,30 @@ button i {
 }
 
 .respostas {
-    background-color: var(--secondary-bg);
-    border-radius: 10px;
-    padding: 1rem;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    background-color: rgba(45, 45, 45, 0.8);
+    backdrop-filter: blur(10px);
+    border-radius: 15px;
+    padding: 1.5rem;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+    transition: all 0.3s ease-out;
+    min-height: 0;
 }
 
 .ac {
-    border: 1px solid var(--border-color);
+    background-color: rgba(45, 45, 45, 0.8) !important;
+    backdrop-filter: blur(5px);
+    border: 1px solid var(--border-color) !important;
     border-radius: 5px;
     margin-bottom: 1rem;
-    background-color: var(--secondary-bg);
 }
 
 .ac-header {
-    background-color: var(--secondary-bg);
+    background-color: var(--secondary-bg) !important;
 }
 
 .ac-trigger {
-    color: var(--highlight-color);
-    background-color: transparent;
+    color: var(--highlight-color) !important;
+    background-color: transparent !important;
     border: none;
     width: 100%;
     text-align: left;
@@ -98,9 +204,12 @@ button i {
 }
 
 .ac-panel {
-    background-color: var(--secondary-bg);
+    background-color: rgba(45, 45, 45, 0.9) !important;
     padding: 1rem;
-    color: var(--text-color);
+    color: var(--text-color) !important;
+    transition: all 0.3s ease-out;
+    min-height: 0;
+    height: auto;
 }
 
 .ac-panel div {
@@ -114,26 +223,26 @@ button i {
 }
 
 .ac-panel a {
-    color: var(--link-color);
+    color: var(--link-color) !important;
 }
 
 .ac-panel code {
-    background-color: var(--bg-color);
-    color: var(--highlight-color);
+    background-color: var(--bg-color) !important;
+    color: var(--highlight-color) !important;
     padding: 2px 4px;
     border-radius: 3px;
 }
 
 .ac-panel pre {
-    background-color: var(--bg-color);
+    background-color: var(--bg-color) !important;
     padding: 1rem;
     border-radius: 5px;
     overflow-x: auto;
 }
 
 .ac-panel pre code {
-    background-color: transparent;
-    color: var(--text-color);
+    background-color: transparent !important;
+    color: var(--text-color) !important;
     padding: 0;
 }
 
@@ -142,10 +251,21 @@ button i {
     font-size: 1.2em;
     margin: 20px 0;
     color: var(--highlight-color);
+    background-color: rgba(45, 45, 45, 0.8);
+    padding: 1.5rem;
+    border-radius: 10px;
+    backdrop-filter: blur(5px);
 }
 
 #loading i {
     margin-right: 10px;
+}
+
+.progress-text {
+    font-size: 0.9em;
+    color: #e0e0e0;
+    margin-top: 0.5rem;
+    font-style: italic;
 }
 
 @media (max-width: 600px) {
@@ -200,4 +320,104 @@ button i {
 .ac .ac-panel pre code {
     background-color: transparent !important;
     color: var(--text-color) !important;
+}
+
+.logo {
+    width: 64px;
+    height: 64px;
+    margin-bottom: 1.5rem;
+    image-rendering: pixelated;
+    transform: scale(3.0);
+    transform-origin: center;
+    transition: transform 0.3s ease;
+    cursor: default; /* Mantém o cursor padrão */
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform-origin: center center;
+    transform: translate(-50%, -50%) scale(3.0);
+    user-select: none; /* Previne seleção da imagem */
+    -webkit-user-drag: none; /* Previne arrasto da imagem */
+}
+
+/* Container para controlar área de hover */
+.logo-container {
+    width: 192px; /* 64px * 3 (scale) */
+    height: 192px; /* 64px * 3 (scale) */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: relative;
+}
+
+/* Efeito hover para interatividade */
+.logo:hover {
+    transform: translate(-50%, -50%) scale(3.2); /* Mantém centralizado durante o hover */
+}
+
+.preview-text {
+    padding: 1rem;
+    color: var(--text-color);
+    font-size: 0.95em;
+    line-height: 1.5;
+    background-color: var(--secondary-bg) !important;
+    border-radius: 5px;
+    margin: 0.5rem 1rem;
+    border: 1px solid var(--border-color);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+    backdrop-filter: blur(5px);
+    display: none; /* Inicialmente oculto */
+}
+
+/* Mostra a prévia quando o conteúdo está disponível */
+.preview-text:not(:empty) {
+    display: block;
+}
+
+/* Esconde a prévia quando o accordeon está expandido */
+.ac.is-active .preview-text {
+    display: none;
+    transition: opacity 0.3s ease;
+}
+
+footer {
+    position: fixed;
+    bottom: 0;
+    right: 0;
+    padding: 1rem;
+    z-index: 1;
+}
+
+.creditos {
+    color: var(--text-color);
+    font-size: 0.8rem;
+    opacity: 0.8;
+    margin: 0;
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.3);
+    backdrop-filter: blur(5px);
+    padding: 0.5rem 1rem;
+    border-radius: 5px;
+    background-color: rgba(45, 45, 45, 0.4);
+}
+
+.creditos span {
+    color: #000000;
+    font-family: 'Press Start 2P', cursive;
+    font-size: 0.7rem;
+    font-weight: 900;
+    text-shadow: 2px 2px 3px rgba(187, 134, 252, 0.8);
+    letter-spacing: 0.5px;
+    display: inline-block;
+    margin-left: 0.3rem;
+    transition: transform 0.2s ease;
+}
+
+.creditos-link {
+    text-decoration: none;
+    cursor: pointer;
+}
+
+.creditos-link:hover span {
+    transform: translateY(-2px);
+    text-shadow: 3px 3px 4px rgba(187, 134, 252, 0.9);
 }
