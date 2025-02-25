@@ -1,8 +1,8 @@
 @echo off
 chcp 65001 > nul
-title Estuda AI - Iniciando Servidor
+title 🤖 Study Buddy 📚 - Iniciando Servidor
 
-echo 🤖 Iniciando o Estuda AI...
+echo 🤖 Iniciando o Study Buddy 📚...
 echo.
 
 REM Verifica se o Python está instalado
