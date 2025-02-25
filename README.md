@@ -36,6 +36,8 @@ A IA fornece links para aulas e recursos online relevantes para os tópicos abor
    - script.js
    - api.js
    - executar_projeto.bat
+   - favicon.png
+   - logo.png
 
 ### 3. Execute o arquivo `executar_projeto.bat` com um duplo clique
 
