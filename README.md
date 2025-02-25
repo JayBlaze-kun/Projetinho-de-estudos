@@ -1,5 +1,7 @@
 # Studdy Buddy
 
+![Logo do Study Buddy](logo.png)
+
 
 Este projeto é um programa auxiliar de estudos inovador, desenvolvido com base nos ensinamentos do Yago (Mr IAgo - IA e Programação - YouTube) e impulsionado pela inteligência artificial do Gemini do Google. Ele oferece uma abordagem interativa e personalizada para o aprendizado, otimizando sua experiência de estudo.
 
