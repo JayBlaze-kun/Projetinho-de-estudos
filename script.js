@@ -2,7 +2,15 @@ import { Gemini } from './api.js';
 
 // Inicializar o acordeão quando o DOM estiver carregado
 document.addEventListener('DOMContentLoaded', () => {
-    new Accordion('.accordion-container');
+    new Accordion('.accordion-container', {
+        openOnInit: [], // Nenhum painel aberto inicialmente
+        oneOpen: false, // Permite múltiplos painéis abertos
+        showMultiple: true, // Habilita abertura múltipla
+        duration: 300 // Duração da animação em ms
+    });
+
+    // Inicializa o Splitting
+    Splitting();
 });
 
 
@@ -37,49 +45,146 @@ async function enviarPrint() {
     }
 }
 
+// Função para atualizar o status do progresso
+function updateProgress(message) {
+    const progressStatus = document.getElementById('progress-status');
+    progressStatus.textContent = message;
+}
+
 // Função para mostrar o indicador de loading
 function showLoading() {
     document.getElementById('loading').style.display = 'block';
+    updateProgress('Iniciando análise da imagem...');
 }
 
 // Função para esconder o indicador de loading
 function hideLoading() {
     document.getElementById('loading').style.display = 'none';
+    document.getElementById('progress-status').textContent = '';
+}
+
+// Função para desabilitar os botões
+function disableButtons() {
+    const buttons = ['tirarFoto', 'enviarFoto', 'enviarPrint'].forEach(id => {
+        const button = document.getElementById(id);
+        button.disabled = true;
+        button.style.opacity = '0.5';
+        button.style.cursor = 'not-allowed';
+    });
+}
+
+// Função para reabilitar os botões
+function enableButtons() {
+    const buttons = ['tirarFoto', 'enviarFoto', 'enviarPrint'].forEach(id => {
+        const button = document.getElementById(id);
+        button.disabled = false;
+        button.style.opacity = '';
+        button.style.cursor = '';
+    });
 }
 
 async function processarFoto(imageFile) {
     try {
-        showLoading(); // Mostra o indicador de loading
+        disableButtons(); // Desabilita os botões
+        showLoading();
+        
+        // Sequência de mensagens durante o processamento
+        setTimeout(() => updateProgress('Analisando o conteúdo da imagem...'), 1000);
+        setTimeout(() => updateProgress('Identificando o tema da questão...'), 2500);
+        setTimeout(() => updateProgress('Preparando os links de estudo...'), 4000);
+        setTimeout(() => updateProgress('Montando a aula personalizada...'), 5500);
+        
         const resultado = await Gemini(imageFile);
-        hideLoading(); // Esconde o indicador de loading
-        exibirResultados(resultado);
+        
+        updateProgress('Finalizando...');
+        setTimeout(() => {
+            hideLoading();
+            exibirResultados(resultado);
+            enableButtons(); // Reabilita os botões após sucesso
+        }, 500);
+        
     } catch (erro) {
-        hideLoading(); // Esconde o indicador de loading em caso de erro
+        updateProgress('Erro ao processar a imagem');
         console.error("Erro ao processar a foto:", erro);
         alert("Ocorreu um erro ao processar a imagem. Por favor, tente novamente.");
+        hideLoading();
+        enableButtons(); // Reabilita os botões em caso de erro
     }
 }
 
+// Função para ocultar os botões de entrada
+function hideInputButtons() {
+    ['tirarFoto', 'enviarFoto', 'enviarPrint'].forEach(id => {
+        const button = document.getElementById(id);
+        button.style.display = 'none';
+    });
+    // Mostra o botão "Outra Questão"
+    document.getElementById('outraQuestao').style.display = 'inline-block';
+}
+
+// Função para mostrar os botões de entrada
+function showInputButtons() {
+    // Verifica se é dispositivo móvel para mostrar botão apropriado
+    if (isMobileDevice()) {
+        document.getElementById('tirarFoto').style.display = 'inline-block';
+        document.getElementById('enviarFoto').style.display = 'inline-block';
+        document.getElementById('enviarPrint').style.display = 'none';
+    } else {
+        document.getElementById('tirarFoto').style.display = 'none';
+        document.getElementById('enviarFoto').style.display = 'inline-block';
+        document.getElementById('enviarPrint').style.display = 'inline-block';
+    }
+    // Oculta o botão "Outra Questão"
+    document.getElementById('outraQuestao').style.display = 'none';
+}
+
+// Função para gerar prévia do conteúdo
+function gerarPrevia(texto, tamanho = 150) {
+    // Primeiro converte o markdown para HTML
+    const htmlContent = marked.parse(texto);
+    
+    // Remove todas as tags HTML mantendo o texto formatado
+    const textoLimpo = htmlContent
+        .replace(/<[^>]*>/g, ' ') // Remove tags HTML
+        .replace(/\s+/g, ' ')     // Remove espaços extras
+        .replace(/&nbsp;/g, ' ')  // Substitui &nbsp; por espaço
+        .replace(/&[a-z]+;/g, '') // Remove outros caracteres HTML especiais
+        .trim();                  // Remove espaços no início e fim
+
+    // Limita o tamanho e adiciona reticências se necessário
+    const previa = textoLimpo.length > tamanho 
+        ? textoLimpo.substring(0, tamanho) + '...'
+        : textoLimpo;
+
+    return previa;
+}
+
+// Atualizar a função exibirResultados
 function exibirResultados(resultado) {
     const linksContent = document.getElementById('linksContent');
     const aulaContent = document.getElementById('aulaContent');
+    const linksPreview = document.getElementById('linksPreview');
+    const aulaPreview = document.getElementById('aulaPreview');
 
-    // Parse o markdown e adicione o atributo target="_blank" a todos os links
     const parsedLinks = marked.parse(resultado.links);
     const parsedAula = marked.parse(resultado.aula);
 
-    // Função para remover estilos inline e classes
     function limparEstilos(html) {
         return html.replace(/style="[^"]*"/g, '')
                    .replace(/class="[^"]*"/g, '')
                    .replace(/<a /g, '<a target="_blank" ');
     }
 
+    // Atualiza o conteúdo principal
     linksContent.innerHTML = limparEstilos(parsedLinks);
     aulaContent.innerHTML = limparEstilos(parsedAula);
 
-    // Mostrar o botão "Outra Questão"
-    document.getElementById('outraQuestao').style.display = 'inline-block';
+    // Atualiza as prévias
+    linksPreview.textContent = gerarPrevia(resultado.links);
+    aulaPreview.textContent = gerarPrevia(resultado.aula);
+
+    // Oculta os botões de entrada e mostra o botão "Outra Questão"
+    hideInputButtons();
 
     // Forçar a aplicação dos estilos escuros
     document.querySelectorAll('.ac-panel *').forEach(el => {
@@ -88,6 +193,7 @@ function exibirResultados(resultado) {
     });
 }
 
+// Atualizar a função outraQuestao
 function outraQuestao() {
     // Limpar cache e cookies
     if (window.caches) {
@@ -101,8 +207,27 @@ function outraQuestao() {
     localStorage.clear();
     sessionStorage.clear();
     
-    // Recarregar a página
-    window.location.reload(true);
+    // Fechar os accordeons
+    document.querySelectorAll('.ac').forEach(accordion => {
+        accordion.classList.remove('is-active');
+    });
+    
+    // Limpar os conteúdos
+    document.getElementById('linksContent').innerHTML = '';
+    document.getElementById('aulaContent').innerHTML = '';
+    
+    // Mostrar os botões de entrada novamente
+    showInputButtons();
+    
+    // Forçar atualização da altura do fundo
+    setTimeout(() => {
+        const height = Math.max(
+            document.documentElement.clientHeight,
+            window.innerHeight || 0
+        );
+        vantaEffect.setOptions({ minHeight: height });
+        vantaEffect.resize();
+    }, 300);
 }
 
 // Adicionar event listeners aos botões
@@ -122,6 +247,20 @@ document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('enviarFoto').addEventListener('click', enviarFoto);
     enviarPrintBtn.addEventListener('click', enviarPrint);
     document.getElementById('outraQuestao').addEventListener('click', outraQuestao);
+
+    // Adicionar listener para atualizar altura quando accordeons são fechados
+    document.querySelectorAll('.ac-trigger').forEach(trigger => {
+        trigger.addEventListener('click', () => {
+            setTimeout(() => {
+                const height = Math.max(
+                    document.documentElement.clientHeight,
+                    window.innerHeight || 0
+                );
+                vantaEffect.setOptions({ minHeight: height });
+                vantaEffect.resize();
+            }, 300);
+        });
+    });
 });
 
 // Inicializar o marked
